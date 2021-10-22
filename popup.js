@@ -33,7 +33,14 @@
         rate = JSON.parse(rate);
         var div = document.createElement('div');
         div.className = 'valute';
-        div.innerHTML = '<h3>' + rate.Valute.USD.Name +': ' + rate.Valute.USD.Value + ' ' + difference(rate.Valute.USD.Value, rate.Valute.USD.Previous) + '</h3>' + '<h3>' + rate.Valute.EUR.Name +': ' + rate.Valute.EUR.Value + ' ' + difference(rate.Valute.EUR.Value, rate.Valute.EUR.Previous) + '</h3>';
+        div.innerHTML = `<h3>${rate.Valute.USD.Name}: ${
+      rate.Valute.USD.Value
+    } ${difference(rate.Valute.USD.Value, rate.Valute.USD.Previous)} </h3> 
+                        <h3>${rate.Valute.EUR.Name}: ${
+      rate.Valute.EUR.Value
+    } ${difference(rate.Valute.EUR.Value, rate.Valute.EUR.Previous)}</h3>`;
+
+    document.body.append(div);
 
         document.body.append(div);     
     }
