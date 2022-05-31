@@ -2,7 +2,7 @@
   "manifest_version": 3,
 
   "name": "Курс валют",
-  "version": "1.0",
+  "version": "2.0",
 
   "icons": {
     "16": "16x16.png",
@@ -15,6 +15,6 @@
   "action": {
     "default_title": "Курс валют",
     "default_icon": "48x48.png",
-    "default_popup": "popup.html"
+    "default_popup": "index.html"
   }
 }
