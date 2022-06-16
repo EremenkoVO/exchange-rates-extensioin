@@ -1,42 +1,32 @@
 <template v-cloak>
   <div id="app">
-    <div class="form-control">
-      <select class="select-control" v-model="valute">
-        <option
-          v-for="valute in listRates"
-          :key="valute.ID"
-          :value="valute.CharCode"
-        >
-          {{ valute.Name }}
+    <div style="width: 500px;">
+      <select v-model="valute">
+        <option v-for="rate in listRates" :key="rate.ID" :value="rate.CharCode">
+          {{rate.Name}}
         </option>
       </select>
-      <button class="btn btn-primary br-l" @click="addRate(valute)">
-        Добавить
-      </button>
-    </div>
-    <div>
-      <div class="list">
-        <span>Выбранные валюты: </span>
-        <button v-if="!isEdit" class="btn btn-primary" @click="goEdit">
-          Редактировать
+
+      <div class="body-btn">
+        <button @click="addRate">
+          Добавить
         </button>
-        <button v-else class="btn btn-primary" @click="stopEdit">
-          Закончить
+        <button @click="editRates">
+          {{ !isEdit ? 'Ред. список' : 'Сохранить'}}
         </button>
       </div>
 
-      <div v-if="isSelectedRates" class="container-rates">
-        <div v-for="rate in selectedRates" :key="rate" class="rate">
-          <div>{{ getItemRate(rate, 'Name') }}</div>
-          <div v-if="!isEdit">
-            {{ getItemRate(rate, 'Value') }} {{ getArrow(rate) }}
-          </div>
-          <div v-else-if="isEdit">
-            <button class="btn btn-delete" @click="deleteRate(rate)">X</button>
-          </div>
+      <div class="rates" v-if="isSelectedRates">
+        <div class="rate" v-for="rate in selectedRates" :key="rate.ID">
+          <span>{{ getItemRate(rate, 'Name')}}</span>
+          <span v-if="!isEdit" v-html="getArrowRate(rate)"></span>
+          <span v-if="isEdit" class="delete" @click="deleteRate(rate)">Удалить</span>
         </div>
       </div>
-      <div v-else class="center">Нет выбранных отслеживаемых валют</div>
+
+      <div class="rates-empty" v-else>
+        Нет валют для отслеживания
+      </div>
     </div>
   </div>
 </template>
@@ -59,9 +49,7 @@ export default {
     this.getRates();
   },
   methods: {
-    /**
-     * Получение валют
-     */
+    // Получение валют
     getRates() {
       const URL = 'https://www.cbr-xml-daily.ru/daily_json.js';
       fetch(URL)
@@ -75,19 +63,29 @@ export default {
         });
     },
 
-    /**
-     * Добавить валюту
-     */
-    addRate(rate) {
-      console.log(this.selectedRates.includes(rate));
-
-      if (this.selectedRates.includes(rate)) return;
-
-      this.selectedRates.push(rate);
-      localStorage.setItem('rates', JSON.stringify(this.selectedRates));
-      this.valute = '';
+    // Получаем значение поля
+    getItemRate(rate, field) {
+      return this.listRates[rate][field];
     },
 
+    // 
+    getArrowRate(rate) {
+      let html;
+
+      let previous = this.listRates[rate].Previous;
+      let value = this.listRates[rate].Value;
+
+      html = previous > value ? `<span style="color: #eb5757">${value} ▼</span>` : `<span style="color: #7bffb2">${value} ▲</span>`
+      
+      return html
+    },
+
+    // Режим редактирования списка
+    editRates() {
+      this.isEdit = !this.isEdit
+    },
+
+    // Удаление списка
     deleteRate(rate) {
       let listRates = this.selectedRates.filter((value) => {
         return value != rate;
@@ -97,106 +95,126 @@ export default {
       localStorage.setItem('rates', JSON.stringify(this.selectedRates));
     },
 
-    getItemRate(rate, field) {
-      return this.listRates[rate][field];
-    },
+    // Добавление валюты в список
+    addRate() {
+      if (this.selectedRates.includes(this.valute)) return;
 
-    getArrow(rate) {
-      let current = this.listRates[rate].Value;
-      let previous = this.listRates[rate].Previous;
-
-      if (current < previous) {
-        return '↓';
-      } else {
-        return '↑';
-      }
-    },
-
-    goEdit() {
-      this.isEdit = true;
-    },
-
-    stopEdit() {
-      this.isEdit = false;
-    },
+      this.selectedRates.push(this.valute);
+      localStorage.setItem('rates', JSON.stringify(this.selectedRates));
+      this.valute = '';
+    }
   },
 };
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
 
 v-cloak {
   display: none;
 }
 
+#app {
+  max-width: 530px;
+  min-width: 510px;
+  min-height: 400px;
+  max-height: 600px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 body {
-  font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
-  width: 415px;
+  background-color: #161730;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  max-width: 530px;
+  min-width: 510px;
+  min-height: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+input, select, option, button {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+select {
+  background: url(search-icon.svg) no-repeat scroll 7px 7px;
+  padding: 10px 12px 10px 30px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  width: 500px;
+  color: #212246;
+  background-color: #838C9E;
+  transition: 250ms;
+  margin-bottom: 15px;
+}
+
+select:focus {
+  border: 2px solid white
+}
+
+*,*:focus,*:hover{
+  outline:none;
+}
+
+.rates-empty {
+  color: white;
+  display: flex;
   height: 300px;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
-div {
-  margin: 5px;
-}
-
-.list {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.form-control {
-  display: flex;
-}
-
-.select-control {
-  font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
-  padding: 5px;
-  border-radius: 5px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
-}
-
-.btn {
-  font-family: 'Ubuntu', Arial, Helvetica, sans-serif;
-  border: 1px solid black;
-  background: none;
-  border-radius: 5px;
-}
-
-.btn-primary {
-  color: #fff;
-  background: #4285f4;
-  border: 1px solid #4285f4;
-  cursor: pointer;
-}
-
-.btn-delete {
-  color: #f15642;
-  cursor: pointer;
-}
-
-.br-l {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-}
-
-.container-rates {
+.rates {
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
-  align-content: stretch;
-  align-items: baseline;
+  transition: 250ms;
 }
 
-.rate {
-  width: 385px;
+.rates > .rate {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  align-content: center;
-  flex-wrap: nowrap;
+  background: #212246;
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 476px;
+  color: white;
+  margin-bottom: 15px;
+  transition: 250ms;
+}
+
+.body-btn {
+  width: 500px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.body-btn > button {
+  width: 240px;
+  border-radius: 10px;
+  padding: 10px 20px;
+  border: 1px solid #212246;
+  background-color: #212246;
+  color: white;
+  cursor: pointer;
+  transition: 250ms;
+}
+
+.body-btn > button:active {
+  border: 1px solid #080913;
+  background-color: #080913;
+}
+
+.body-btn > button:hover {
+  border: 1px solid #33346c;
+  background-color: #33346c;
+}
+
+.delete {
+  color: #eb5757;
+  padding: 0px;
+  cursor: pointer;
 }
 </style>
