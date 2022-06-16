@@ -1,9 +1,8 @@
 {
-  "manifest_version": 3,
-
+  "manifest_version": 2,
   "name": "Курс валют",
-  "version": "2.0",
-
+  "description": "Простое расширение для отслеживания курса валют",
+  "version": "2.1.1",
   "icons": {
     "16": "16x16.png",
     "32": "32x32.png",
@@ -11,10 +10,18 @@
     "96": "96x96.png",
     "128": "128x128.png"
   },
-
-  "action": {
+  "applications": {
+    "gecko": {
+      "id": "eremenko.v.o@yandex.ru",
+      "strict_min_version": "45.0"
+    }
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "16x16.png",
+      "32": "32x32.png"
+    },
     "default_title": "Курс валют",
-    "default_icon": "48x48.png",
     "default_popup": "index.html"
   }
 }
